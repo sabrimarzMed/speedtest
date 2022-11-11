@@ -24,4 +24,5 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - run: |
-          curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -
+          sudo apt install speedtest-cli
+          speedtest-cli --secure
