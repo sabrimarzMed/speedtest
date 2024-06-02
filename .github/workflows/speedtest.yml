@@ -9,24 +9,27 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  envmap:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    outputs:
+      is_valid: ${{ steps.verify_tag.outputs.is_valid }}
+      prefix: ${{ steps.verify_tag.outputs.prefix }}
+      version: ${{ steps.verify_tag.outputs.version }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - run: |
+      - name: verify tag
+        id: verify_tag
+        run: |
           TAG_NAME=${{ github.ref_name }}
           if [[ "$TAG_NAME" =~ ^([a-z]{2})-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
           COUNTRY=${BASH_REMATCH[1]}
           VERSION=${BASH_REMATCH[2]}
-          echo "Tag $TAG_NAME matches the pattern."
-          echo "::set-output name=is_valid::true"
-          echo "::set-output name=prefix::$PREFIX"
-          echo "::set-output name=version::$VERSION"
+          ENVIRONMENT=prod-$COUNTRY
+          echo "$TAG_NAME matches the pattern"
+          echo "is_valid=true" >> "$GITHUB_OUTPUT"
+          echo "prefix=$PREFIX" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           else
-          echo "Tag $TAG_NAME does not match the pattern."
-          echo "::set-output name=is_valid::false"
+          echo "$TAG_NAME does not match the patter"
+          echo "is_valid=false" >> "$GITHUB_OUTPUT"
           exit 1
           fi
