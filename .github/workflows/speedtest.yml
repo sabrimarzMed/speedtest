@@ -17,5 +17,16 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - run: |
-          sudo apt install speedtest-cli
-          speedtest-cli --secure
+          TAG_NAME=${{ github.ref_name }}
+          if [[ "$TAG_NAME" =~ ^([a-z]{2})-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+          COUNTRY=${BASH_REMATCH[1]}
+          VERSION=${BASH_REMATCH[2]}
+          echo "Tag $TAG_NAME matches the pattern."
+          echo "::set-output name=is_valid::true"
+          echo "::set-output name=prefix::$PREFIX"
+          echo "::set-output name=version::$VERSION"
+          else
+          echo "Tag $TAG_NAME does not match the pattern."
+          echo "::set-output name=is_valid::false"
+          exit 1
+          fi
